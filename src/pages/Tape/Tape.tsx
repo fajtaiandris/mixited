@@ -4,7 +4,7 @@ import React, { FC, useState } from 'react';
 import { OnProgressProps } from 'react-player/base';
 import { useParams } from 'react-router-dom';
 
-import { Playlist } from '@interfaces/Playlist';
+import { CassetteTape } from '@interfaces/CassetteTape';
 
 import { Button } from '@ui/Button';
 
@@ -23,7 +23,7 @@ const tapeQuery = (id: string) => ({
         statusText: (await response.text()) || response.statusText,
       });
     }
-    const tape: Playlist = await response.json();
+    const tape: CassetteTape = await response.json();
     return tape;
   },
 });
@@ -41,15 +41,15 @@ type PlayerState = 'playing' | 'pausing' | 'stopped';
 export const Tape: FC = () => {
   const { tapeId } = useParams();
   const { data } = useQuery(tapeQuery(tapeId as string));
-  const tape = data || [];
+  const tape = data || { sideA: [], sideB: [] };
   const [playerState, setPlayerState] = useState<PlayerState>('stopped');
-  const [playedSeconds, setPlayedSeconds] = useState<number>(tape[0].startSec || 0);
+  const [playedSeconds, setPlayedSeconds] = useState<number>(tape.sideA[0].startSec || 0);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
 
-  const track = tape[currentTrackIndex];
+  const track = tape.sideA[currentTrackIndex];
 
   const setTrack = (trackIndex: number) => {
-    setPlayedSeconds(tape[trackIndex].startSec || 0);
+    setPlayedSeconds(tape.sideA[trackIndex].startSec || 0);
     setCurrentTrackIndex(trackIndex);
   };
 
@@ -76,7 +76,7 @@ export const Tape: FC = () => {
   };
 
   const handleForward = () => {
-    if (currentTrackIndex >= tape.length - 1) {
+    if (currentTrackIndex >= tape.sideA.length - 1) {
       return;
     }
     setTrack(currentTrackIndex + 1);
@@ -90,7 +90,7 @@ export const Tape: FC = () => {
   };
 
   const handleTrackEnd = () => {
-    if (currentTrackIndex === tape.length - 1) {
+    if (currentTrackIndex === tape.sideA.length - 1) {
       handleStop();
       return;
     }
@@ -112,9 +112,9 @@ export const Tape: FC = () => {
       <div className="grid grid-cols-1 justify-items-center space-y-4 pt-4">
         <Cassette />
         <div className="space-y-2 bg-neutral-50 p-4 font-mono text-sm text-neutral-800">
-          {tape.map((track, i) => (
+          {tape.sideA.map((track, i) => (
             <div key={i}>
-              {`${i + 1}. ${track.title}`}
+              {`${i + 1}. ${track.label}`}
               <div className="h-1 bg-neutral-200"></div>
             </div>
           ))}
@@ -122,7 +122,7 @@ export const Tape: FC = () => {
 
         {/* Unhide this for debugging */}
         <div className="hidden">
-          {tape.map((track, i) => {
+          {tape.sideA.map((track, i) => {
             return currentTrackIndex === i ? (
               track.source === 'youtube' && (
                 <div key={`player-${i}`} className="min-w-[500px] rounded-lg bg-neutral-800 p-2">
@@ -143,7 +143,7 @@ export const Tape: FC = () => {
                 </div>
               )
             ) : (
-              <div key={`player-${i}`}>{`Freezed: ${track.title}`}</div>
+              <div key={`player-${i}`}>{`Freezed: ${track.label}`}</div>
             );
           })}
         </div>

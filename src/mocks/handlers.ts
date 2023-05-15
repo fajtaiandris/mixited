@@ -1,29 +1,26 @@
 import { rest } from 'msw';
 
-import { Playlist } from '@interfaces/Playlist';
+import { CassetteTape } from '@interfaces/CassetteTape';
 
-const dummyPlaylist: Playlist = [
-  {
-    source: 'youtube',
-    title: 'Fireflies',
-    content: 'KWnH23lgHOY',
-    endSec: 5,
-  },
-  {
-    source: 'youtube',
-    title: 'sweet dreams cover',
-    content: 'jMfe7j-iMzI',
-    startSec: 98,
-    endSec: 150,
-  },
-  {
-    source: 'youtube',
-    title: `If You Think It's Love`,
-    content: 'XR_PWnP8-CU',
-    startSec: 45,
-    endSec: 56.5,
-  },
-];
+const dummyPlaylist: CassetteTape = {
+  sideA: [
+    {
+      source: 'youtube',
+      label: 'Hit the Back',
+      content: '3TYznvuRMwk',
+      startSec: 6,
+      endSec: 238,
+    },
+    {
+      source: 'youtube',
+      label: `If You Think It's Love`,
+      content: 'XR_PWnP8-CU',
+      startSec: 45,
+      endSec: 56.5,
+    },
+  ],
+  sideB: [],
+};
 
 export const handlers = [
   rest.get('/api/tape/:tapeId', (req, res, ctx) => {
