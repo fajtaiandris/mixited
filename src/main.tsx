@@ -6,12 +6,12 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
 import './index.css';
 import { ErrorPage } from './pages/Error';
-import { PrivateOutlet } from './pages/PrivateOutlet';
 import { Root } from './pages/Root';
+import { Tape, tapeLoader } from './pages/Tape';
 
 async function prepare() {
   if (import.meta.env.DEV) {
-    import('./mocks/browser').then(({ worker }) => {
+    await import('./mocks/browser').then(({ worker }) => {
       worker.start();
     });
   }
@@ -19,30 +19,21 @@ async function prepare() {
 
 const queryClient = new QueryClient();
 
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <Root></Root>,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/some-public-route',
-    element: <>See, works!</>,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/some-private-route',
-    element: <PrivateOutlet />,
-    children: [
-      {
-        path: '',
-        element: <>This page is private</>,
-      },
-    ],
-  },
-]);
-
 prepare().then(() => {
+  const router = createBrowserRouter([
+    {
+      path: '/',
+      element: <Root></Root>,
+      errorElement: <ErrorPage />,
+    },
+    {
+      path: '/tape/:tapeId',
+      element: <Tape />,
+      loader: tapeLoader(queryClient),
+      errorElement: <ErrorPage />,
+    },
+  ]);
+
   ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>

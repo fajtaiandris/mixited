@@ -30,7 +30,7 @@ export const Button: FC<Props> = ({
   const getStyle = () => {
     switch (variant) {
       case 'primary':
-        return cx('bg-neutral-400 px-2 text-neutral-600', isPushedIn && 'bg-neutral-500 text-neutral-700');
+        return cx('bg-neutral-400 px-2 text-neutral-800', isPushedIn && 'bg-neutral-500');
       case 'secondary':
         return cx(
           'rounded px-2 text-white shadow',

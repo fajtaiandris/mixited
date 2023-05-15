@@ -1,6 +1,6 @@
 import { OnProgressProps } from 'react-player/base';
 
-import { Track } from '../Root';
+import { Track } from '@interfaces/Track';
 
 export interface PlayerProps {
   playing: boolean;
