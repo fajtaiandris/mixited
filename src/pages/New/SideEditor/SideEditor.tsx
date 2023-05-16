@@ -37,6 +37,10 @@ export const SideEditor: FC<SideEditorProps> = ({ side, isInEdit, onStartEdit, o
     onUpdate([...trackList.slice(0, index), trackList[index + 1], trackList[index], ...trackList.slice(index + 2)]);
   };
 
+  const handleTrackRemove = (index: number) => {
+    onUpdate([...trackList.slice(0, index), ...trackList.slice(index + 1)]);
+  };
+
   const handleTrackPaste = () => {
     onUpdate([...trackList, { label: 'untitled', content: 'asdfasdf', source: 'youtube' }]);
   };
@@ -55,9 +59,7 @@ export const SideEditor: FC<SideEditorProps> = ({ side, isInEdit, onStartEdit, o
             isMoveableUp={i > 0}
             onMoveUp={handleTrackMoveUp}
             onMoveDown={handleTrackMoveDown}
-            onRemove={function (index: number): void {
-              throw new Error('Function not implemented.');
-            }}
+            onRemove={handleTrackRemove}
             onUpdate={handleTrackUpdate}
             onStartEdit={handleTrackStartEdit}
           />
