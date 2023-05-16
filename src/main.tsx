@@ -6,7 +6,8 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
 import './index.css';
 import { ErrorPage } from './pages/Error';
-import { Root } from './pages/Root';
+import { Landing } from './pages/Landing';
+import { New } from './pages/New';
 import { Tape, tapeLoader } from './pages/Tape';
 
 async function prepare() {
@@ -23,13 +24,18 @@ prepare().then(() => {
   const router = createBrowserRouter([
     {
       path: '/',
-      element: <Root></Root>,
+      element: <Landing />,
       errorElement: <ErrorPage />,
     },
     {
       path: '/tape/:tapeId',
       element: <Tape />,
       loader: tapeLoader(queryClient),
+      errorElement: <ErrorPage />,
+    },
+    {
+      path: '/new',
+      element: <New />,
       errorElement: <ErrorPage />,
     },
   ]);
