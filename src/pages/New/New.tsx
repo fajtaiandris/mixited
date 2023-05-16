@@ -10,22 +10,7 @@ export type Side = 'A' | 'B';
 export const New: FC = () => {
   const [sideInEdit, setSideInEdit] = useState<Side | null>(null);
   const [tape, setTape] = useState<CassetteTape>({
-    sideA: [
-      {
-        source: 'youtube',
-        label: 'Hit the Back',
-        content: '3TYznvuRMwk',
-        startSec: 6,
-        endSec: 238,
-      },
-      {
-        source: 'youtube',
-        label: `If You Think It's Love`,
-        content: 'XR_PWnP8-CU',
-        startSec: 45,
-        endSec: 56.5,
-      },
-    ],
+    sideA: [],
     sideB: [],
   });
 

@@ -10,9 +10,9 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { zodResolver } from '@hookform/resolvers/zod';
 import cx from 'classix';
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { DIRTY, ZodType, z } from 'zod';
+import { ZodType, z } from 'zod';
 
 import { Track } from '@interfaces/Track';
 
@@ -24,6 +24,8 @@ interface TrackEditorProps {
   track: Track;
   index: number;
   isInEdit: boolean;
+  isMovableDown: boolean;
+  isMoveableUp: boolean;
   onMoveUp: (index: number) => void;
   onMoveDown: (index: number) => void;
   onRemove: (index: number) => void;
@@ -39,12 +41,15 @@ export const TrackEditor: FC<TrackEditorProps> = ({
   track,
   index,
   isInEdit,
+  isMovableDown,
+  isMoveableUp,
   onMoveUp,
   onMoveDown,
   onRemove,
   onUpdate,
   onStartEdit,
 }) => {
+  console.log(index + 1 + track.label);
   const schema: ZodType<Inputs> = z.object({
     label: z.string().min(3, `Label is too short`).max(30, `Label is too long`),
   });
@@ -55,17 +60,11 @@ export const TrackEditor: FC<TrackEditorProps> = ({
     reset,
   } = useForm<Inputs>({ resolver: zodResolver(schema) });
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    setILastEditSuccessful(true);
     onUpdate(index, { ...track, label: data.label });
   };
-  const [isLastEditSuccessful, setILastEditSuccessful] = useState<boolean>(false);
 
   useEffect(() => {
-    if (isInEdit || isLastEditSuccessful) {
-      return;
-    }
     reset();
-    setILastEditSuccessful(false);
   }, [isInEdit]);
 
   const handleStartEdit = () => {
@@ -88,8 +87,8 @@ export const TrackEditor: FC<TrackEditorProps> = ({
           <div className="space-x-1">
             {!isInEdit && <Button icon={faEdit} onClick={handleStartEdit} />}
             {isInEdit && <Button icon={faCheck} type={'submit'} />}
-            <Button icon={faArrowUp} isDisabled={isInEdit} onClick={() => onMoveUp(index)} />
-            <Button icon={faArrowDown} isDisabled={isInEdit} onClick={() => onMoveDown(index)} />
+            <Button icon={faArrowUp} isDisabled={isInEdit || !isMoveableUp} onClick={() => onMoveUp(index)} />
+            <Button icon={faArrowDown} isDisabled={isInEdit || !isMovableDown} onClick={() => onMoveDown(index)} />
             <Button icon={faRemove} isDisabled={isInEdit} onClick={() => onRemove(index)} />
           </div>
         </div>

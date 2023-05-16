@@ -37,6 +37,10 @@ export const SideEditor: FC<SideEditorProps> = ({ side, isInEdit, onStartEdit, o
     onUpdate([...trackList.slice(0, index), trackList[index + 1], trackList[index], ...trackList.slice(index + 2)]);
   };
 
+  const handleTrackPaste = () => {
+    onUpdate([...trackList, { label: 'untitled', content: 'asdfasdf', source: 'youtube' }]);
+  };
+
   return (
     <div className="p-1 font-mono">
       <div className="grid grid-cols-1 space-y-2 bg-neutral-300 p-2">
@@ -47,6 +51,8 @@ export const SideEditor: FC<SideEditorProps> = ({ side, isInEdit, onStartEdit, o
             track={track}
             index={i}
             isInEdit={isInEdit && trackInEdit === i}
+            isMovableDown={i < trackList.length - 1}
+            isMoveableUp={i > 0}
             onMoveUp={handleTrackMoveUp}
             onMoveDown={handleTrackMoveDown}
             onRemove={function (index: number): void {
@@ -57,7 +63,7 @@ export const SideEditor: FC<SideEditorProps> = ({ side, isInEdit, onStartEdit, o
           />
         ))}
         <div className="flex justify-center">
-          <Button icon={faPlus} text={'Click to paste link'} />
+          <Button icon={faPlus} text={'Click to paste link'} onClick={handleTrackPaste} />
         </div>
       </div>
     </div>
