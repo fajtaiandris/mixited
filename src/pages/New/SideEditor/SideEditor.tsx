@@ -1,4 +1,5 @@
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import getYouTubeID from 'get-youtube-id';
 import React, { FC, useState } from 'react';
 
 import { Track } from '@interfaces/Track';
@@ -41,8 +42,12 @@ export const SideEditor: FC<SideEditorProps> = ({ side, isInEdit, onStartEdit, o
     onUpdate([...trackList.slice(0, index), ...trackList.slice(index + 1)]);
   };
 
-  const handleTrackPaste = () => {
-    onUpdate([...trackList, { label: 'untitled', content: 'asdfasdf', source: 'youtube' }]);
+  const handleTrackPaste = async () => {
+    const youTubeId = getYouTubeID(await navigator.clipboard.readText());
+    if (!youTubeId) {
+      return;
+    }
+    onUpdate([...trackList, { label: 'untitled', content: youTubeId, source: 'youtube', startSec: 10, endSec: 20 }]);
   };
 
   return (
