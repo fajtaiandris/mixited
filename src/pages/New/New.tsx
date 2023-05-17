@@ -1,7 +1,10 @@
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import React, { FC, useState } from 'react';
 
 import { CassetteTape } from '@interfaces/CassetteTape';
 import { Track } from '@interfaces/Track';
+
+import { Button } from '@ui/Button';
 
 import { SideEditor } from './SideEditor';
 
@@ -24,9 +27,15 @@ export const New: FC = () => {
     setSideInEdit(null);
   };
 
+  const handleSave = () => {
+    console.log(tape);
+  };
+
   return (
     <div className="h-screen space-y-2 bg-neutral-200 p-4">
       <h1 className="font-mono text-2xl">Mix Tape Creator</h1>
+
+      <Button icon={faCheck} text="Save" className="text-lg" onClick={handleSave} />
       <div className="grid lg:grid-cols-2">
         {(['A', 'B'] as Side[]).map((side) => (
           <SideEditor

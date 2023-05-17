@@ -5,11 +5,14 @@ import {
   faCut,
   faEdit,
   faExclamationTriangle,
+  faPaste,
   faRemove,
+  faTape,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { zodResolver } from '@hookform/resolvers/zod';
 import cx from 'classix';
+import getYouTubeID from 'get-youtube-id';
 import React, { FC, useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { ZodType, z } from 'zod';
@@ -35,6 +38,7 @@ interface TrackEditorProps {
 
 type Inputs = {
   label: string;
+  content: string;
 };
 
 export const TrackEditor: FC<TrackEditorProps> = ({
@@ -49,18 +53,19 @@ export const TrackEditor: FC<TrackEditorProps> = ({
   onUpdate,
   onStartEdit,
 }) => {
-  console.log(index + 1 + track.label);
   const schema: ZodType<Inputs> = z.object({
     label: z.string().min(3, `Label is too short`).max(30, `Label is too long`),
+    content: z.string().min(1),
   });
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
     reset,
   } = useForm<Inputs>({ resolver: zodResolver(schema) });
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    onUpdate(index, { ...track, label: data.label });
+    onUpdate(index, { ...track, label: data.label, content: data.content });
   };
 
   useEffect(() => {
@@ -71,10 +76,18 @@ export const TrackEditor: FC<TrackEditorProps> = ({
     onStartEdit(index);
   };
 
+  const handleUpdateLinkFromClipboard = async () => {
+    const youTubeId = getYouTubeID(await navigator.clipboard.readText());
+    if (!youTubeId) {
+      return;
+    }
+    setValue('content', youTubeId);
+  };
+
   return (
     <div className={cx(isInEdit && 'border-neutral-700', 'border-2 border-neutral-100 bg-neutral-100 p-2')}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex justify-between ">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
+        <div className="flex justify-between">
           <span>
             <span>{index + 1}. </span>
             <input
@@ -87,22 +100,49 @@ export const TrackEditor: FC<TrackEditorProps> = ({
           <div className="space-x-1">
             {!isInEdit && <Button icon={faEdit} onClick={handleStartEdit} />}
             {isInEdit && <Button icon={faCheck} type={'submit'} />}
-            <Button icon={faArrowUp} isDisabled={isInEdit || !isMoveableUp} onClick={() => onMoveUp(index)} />
-            <Button icon={faArrowDown} isDisabled={isInEdit || !isMovableDown} onClick={() => onMoveDown(index)} />
-            <Button icon={faRemove} isDisabled={isInEdit} onClick={() => onRemove(index)} />
+            <Button
+              icon={faArrowUp}
+              isDisabled={isInEdit || !isMoveableUp}
+              onClick={() => onMoveUp(index)}
+              className="disabled:hidden"
+            />
+            <Button
+              icon={faArrowDown}
+              isDisabled={isInEdit || !isMovableDown}
+              onClick={() => onMoveDown(index)}
+              className="disabled:hidden"
+            />
+            <Button icon={faRemove} isDisabled={isInEdit} onClick={() => onRemove(index)} className="disabled:hidden" />
           </div>
         </div>
-        {(track.startSec || track.endSec) && (
-          <span>
-            <FontAwesomeIcon icon={faCut} className="mr-2" />
-            {track.startSec && clockTime(track.startSec)} - {track.endSec && clockTime(track.endSec)}
-          </span>
-        )}
-        {!!errors.label && (
-          <div className="mt-2 bg-red-400 p-2">
-            <FontAwesomeIcon icon={faExclamationTriangle} /> {errors.label.message}
-          </div>
-        )}
+        <div className="flex space-x-2">
+          <FontAwesomeIcon icon={faTape} className="pt-1" />
+          <input
+            className={cx(isInEdit && 'underline underline-offset-4', 'w-full bg-neutral-100 outline-none')}
+            defaultValue={track.content}
+            disabled={!isInEdit}
+            {...register('content')}
+          ></input>
+          <Button
+            icon={faPaste}
+            isDisabled={!isInEdit}
+            onClick={handleUpdateLinkFromClipboard}
+            className="disabled:hidden"
+          />
+        </div>
+        <div>
+          {(track.startSec || track.endSec) && (
+            <span>
+              <FontAwesomeIcon icon={faCut} className="mr-2" />
+              {track.startSec && clockTime(track.startSec)} - {track.endSec && clockTime(track.endSec)}
+            </span>
+          )}
+          {!!errors.label && (
+            <div className="mt-2 bg-red-400 p-2">
+              <FontAwesomeIcon icon={faExclamationTriangle} /> {errors.label.message}
+            </div>
+          )}
+        </div>
       </form>
     </div>
   );
