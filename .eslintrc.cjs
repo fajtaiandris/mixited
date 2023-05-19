@@ -39,6 +39,20 @@ module.exports = {
       },
     ],
     'prettier/prettier': 'error',
+    'jsx-a11y/no-static-element-interactions': [
+      'error',
+      {
+        handlers: [
+          'onClick',
+          'onMouseDown',
+          'onMouseUp',
+          'onKeyPress',
+          'onKeyDown',
+          'onKeyUp',
+        ],
+        allowExpressionValues: true,
+      },
+    ]
   },
   plugins: ['@typescript-eslint', 'import', 'prettier'],
 };
