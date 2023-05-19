@@ -6,6 +6,7 @@ import { Track } from '@interfaces/Track';
 
 import { Button } from '@ui/Button';
 
+import { InsertEditor } from './InsertEditor';
 import { SideEditor } from './SideEditor';
 
 export type Side = 'A' | 'B';
@@ -32,10 +33,14 @@ export const New: FC = () => {
   };
 
   return (
-    <div className="h-screen space-y-2 bg-neutral-200 p-4">
-      <h1 className="font-mono text-2xl">Mix Tape Creator</h1>
+    <div className="h-screen space-y-4 bg-neutral-200 p-4">
+      <div className="flex space-x-4">
+        <h1 className="font-mono text-2xl">Mix Tape Creator</h1>
+        <Button icon={faCheck} text="Save" className="text-lg" onClick={handleSave} />
+      </div>
 
-      <Button icon={faCheck} text="Save" className="text-lg" onClick={handleSave} />
+      <InsertEditor />
+
       <div className="grid lg:grid-cols-2">
         {(['A', 'B'] as Side[]).map((side) => (
           <SideEditor
