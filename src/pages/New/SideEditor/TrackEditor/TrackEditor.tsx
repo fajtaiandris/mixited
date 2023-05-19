@@ -2,7 +2,6 @@ import {
   faArrowDown,
   faArrowUp,
   faCheck,
-  faCut,
   faEdit,
   faExclamationTriangle,
   faPaste,
@@ -21,7 +20,7 @@ import { Track } from '@interfaces/Track';
 
 import { Button } from '@ui/Button';
 
-import { clockTime } from '@util/time';
+import { TimerIntervalInput } from './TimerIntervalInput';
 
 interface TrackEditorProps {
   track: Track;
@@ -39,6 +38,8 @@ interface TrackEditorProps {
 type Inputs = {
   label: string;
   content: string;
+  startSec: number;
+  endSec: number;
 };
 
 export const TrackEditor: FC<TrackEditorProps> = ({
@@ -53,9 +54,12 @@ export const TrackEditor: FC<TrackEditorProps> = ({
   onUpdate,
   onStartEdit,
 }) => {
+  const dummyLength = 20;
   const schema: ZodType<Inputs> = z.object({
     label: z.string().min(3, `Label is too short`).max(30, `Label is too long`),
     content: z.string().min(1),
+    startSec: z.number().min(0, `Minimum value is 0`),
+    endSec: z.number().min(0, `Maximum can not be higher than the length of the track`),
   });
   const {
     register,
@@ -63,13 +67,20 @@ export const TrackEditor: FC<TrackEditorProps> = ({
     formState: { errors },
     setValue,
     reset,
+    watch,
   } = useForm<Inputs>({ resolver: zodResolver(schema) });
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    onUpdate(index, { ...track, label: data.label, content: data.content });
+    onUpdate(index, {
+      source: track.source,
+      label: data.label,
+      content: data.content,
+      ...(data.startSec !== 0 && { startSec: data.startSec }),
+      ...(data.endSec !== dummyLength && { endSec: data.endSec }),
+    });
   };
 
   useEffect(() => {
-    reset();
+    reset({ startSec: track.startSec, endSec: track.endSec });
   }, [isInEdit]);
 
   const handleStartEdit = () => {
@@ -82,6 +93,11 @@ export const TrackEditor: FC<TrackEditorProps> = ({
       return;
     }
     setValue('content', youTubeId);
+  };
+
+  const handleTimerUpdate: (data: { startSec: number; endSec: number }) => void = ({ startSec, endSec }) => {
+    setValue('startSec', startSec);
+    setValue('endSec', endSec);
   };
 
   return (
@@ -131,12 +147,13 @@ export const TrackEditor: FC<TrackEditorProps> = ({
           />
         </div>
         <div>
-          {(track.startSec || track.endSec) && (
-            <span>
-              <FontAwesomeIcon icon={faCut} className="mr-2" />
-              {track.startSec && clockTime(track.startSec)} - {track.endSec && clockTime(track.endSec)}
-            </span>
-          )}
+          <TimerIntervalInput
+            isInEdit={isInEdit}
+            startSec={watch('startSec')}
+            endSec={watch('endSec')}
+            length={dummyLength}
+            onUpdate={handleTimerUpdate}
+          ></TimerIntervalInput>
           {!!errors.label && (
             <div className="mt-2 bg-red-400 p-2">
               <FontAwesomeIcon icon={faExclamationTriangle} /> {errors.label.message}

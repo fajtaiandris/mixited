@@ -47,7 +47,7 @@ export const SideEditor: FC<SideEditorProps> = ({ side, isInEdit, onStartEdit, o
     if (!youTubeId) {
       return;
     }
-    onUpdate([...trackList, { label: 'untitled', content: youTubeId, source: 'youtube', startSec: 10, endSec: 20 }]);
+    onUpdate([...trackList, { label: 'untitled', content: youTubeId, source: 'youtube', startSec: 0, endSec: 20 }]);
   };
 
   return (
