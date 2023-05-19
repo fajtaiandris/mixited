@@ -23,9 +23,11 @@
     "@hookform/resolvers": "^3.0.0",
     "@tanstack/react-query": "^4.28.0",
     "get-youtube-id": "^1.0.1",
+    "html2canvas": "^1.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.43.8",
+    "react-image-crop": "^10.0.11",
     "react-player": "^2.12.0",
     "react-router-dom": "^6.9.0",
     "zod": "^3.21.4"
