@@ -58,8 +58,8 @@ export const TrackEditor: FC<TrackEditorProps> = ({
   const schema: ZodType<Inputs> = z.object({
     label: z.string().min(3, `Label is too short`).max(30, `Label is too long`),
     content: z.string().min(1),
-    startSec: z.number().min(0, `Minimum value is 0`),
-    endSec: z.number().min(0, `Maximum can not be higher than the length of the track`),
+    startSec: z.number().min(0, `Minimum value is 0`).max(3599),
+    endSec: z.number().min(0, `Maximum can not be higher than the length of the track`).max(3599),
   });
   const {
     register,
@@ -153,6 +153,7 @@ export const TrackEditor: FC<TrackEditorProps> = ({
             endSec={watch('endSec')}
             length={dummyLength}
             onUpdate={handleTimerUpdate}
+            onEnter={handleSubmit(onSubmit)}
           ></TimerIntervalInput>
           {!!errors.label && (
             <div className="mt-2 bg-red-400 p-2">

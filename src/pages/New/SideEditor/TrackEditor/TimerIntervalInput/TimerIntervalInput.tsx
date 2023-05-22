@@ -1,7 +1,7 @@
 import { faCut } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import cx from 'classix';
-import React, { FC, KeyboardEvent } from 'react';
+import React, { FC, RefObject, useRef } from 'react';
 
 import { clockTime } from '@util/time';
 
@@ -11,6 +11,7 @@ interface Props {
   endSec?: number;
   isInEdit: boolean;
   onUpdate: (data: { startSec: number; endSec: number }) => void;
+  onEnter: () => void;
 }
 
 export const TimerIntervalInput: FC<Props> = ({
@@ -19,8 +20,33 @@ export const TimerIntervalInput: FC<Props> = ({
   endSec = length,
   isInEdit = false,
   onUpdate,
+  onEnter,
 }) => {
-  const charStyle = `outline-none focus:bg-neutral-700 focus:text-neutral-100`;
+  const digitRefs: Map<'s' | 'e', RefObject<HTMLSpanElement>[]> = new Map([
+    [
+      's',
+      [
+        useRef<HTMLSpanElement>(null),
+        useRef<HTMLSpanElement>(null),
+        useRef<HTMLSpanElement>(null),
+        useRef<HTMLSpanElement>(null),
+      ],
+    ],
+    [
+      'e',
+      [
+        useRef<HTMLSpanElement>(null),
+        useRef<HTMLSpanElement>(null),
+        useRef<HTMLSpanElement>(null),
+        useRef<HTMLSpanElement>(null),
+      ],
+    ],
+  ]);
+
+  const charStyle = cx(
+    'outline-none cursor-default',
+    isInEdit && 'cursor-pointer underline focus:bg-neutral-700 focus:text-neutral-100',
+  );
 
   const startTime = clockTime(startSec);
   const endTime = clockTime(endSec);
@@ -28,24 +54,22 @@ export const TimerIntervalInput: FC<Props> = ({
   const isStartTimeVisible = (startSec > 0 && !isInEdit) || isInEdit;
   const isEndTimeVisible = (endSec < length && !isInEdit) || isInEdit;
 
-  const handleKeyPressed = (e: KeyboardEvent<HTMLSpanElement>, element: 's' | 'e', amount: number) => {
-    if (
-      e.key !== 'ArrowDown' &&
-      e.key !== 'ArrowLeft' &&
-      e.key !== 'ArrowRight' &&
-      e.key !== 'ArrowUp' &&
-      !e.currentTarget.id
-    ) {
+  const handleKeyPressed = (key: string, element: 's' | 'e', charPos: number) => {
+    if (key === 'Enter') {
+      onEnter();
+      return;
+    }
+    if (!isInEdit && key !== 'ArrowDown' && key !== 'ArrowLeft' && key !== 'ArrowRight' && key !== 'ArrowUp') {
       return;
     }
 
-    const charPos = Number(e.currentTarget.id.split(':').pop());
+    const amount = [600, 60, 10, 1][charPos];
     let changedValue = element === 's' ? startSec : endSec;
 
-    if (e.key === 'ArrowDown') changedValue -= amount;
-    if (e.key === 'ArrowUp') changedValue += amount;
-    if (e.key === 'ArrowLeft' && charPos !== 1) document.getElementById(`${element}:${charPos - 1}`)?.focus();
-    if (e.key === 'ArrowRight' && charPos !== 4) document.getElementById(`${element}:${charPos + 1}`)?.focus();
+    if (key === 'ArrowDown') changedValue -= amount;
+    if (key === 'ArrowUp') changedValue += amount;
+    if (key === 'ArrowLeft' && charPos !== 0) digitRefs.get(element)?.[charPos - 1].current?.focus();
+    if (key === 'ArrowRight' && charPos !== 3) digitRefs.get(element)?.[charPos + 1].current?.focus();
 
     changedValue >= 0 &&
       ((element === 's' && changedValue < endSec) || (element === 'e' && changedValue > startSec)) &&
@@ -62,46 +86,46 @@ export const TimerIntervalInput: FC<Props> = ({
   }
 
   return (
-    <div className="inline-block">
+    <div className="inline-block cursor-default font-mono">
       <FontAwesomeIcon icon={faCut} className="mr-2" />
 
       {/* START_TIME */}
       {isStartTimeVisible && (
         <div className="inline-block">
           <span
-            className={cx(charStyle, isInEdit && 'underline')}
-            id="s:1"
-            onKeyDown={(e) => handleKeyPressed(e, 's', 600)}
+            className={charStyle}
+            ref={digitRefs.get('s')?.[0]}
+            onKeyDown={(e) => handleKeyPressed(e.key, 's', 0)}
             role="button"
-            tabIndex={-1}
+            tabIndex={0}
           >
             {startTime.at(0)}
           </span>
           <span
-            className={cx(charStyle, isInEdit && 'underline')}
-            id="s:2"
-            onKeyDown={(e) => handleKeyPressed(e, 's', 60)}
+            className={charStyle}
+            ref={digitRefs.get('s')?.[1]}
+            onKeyDown={(e) => handleKeyPressed(e.key, 's', 1)}
             role="button"
-            tabIndex={-1}
+            tabIndex={0}
           >
             {startTime.at(1)}
           </span>
           :
           <span
-            className={cx(charStyle, isInEdit && 'underline')}
-            id="s:3"
-            onKeyDown={(e) => handleKeyPressed(e, 's', 10)}
+            className={charStyle}
+            ref={digitRefs.get('s')?.[2]}
+            onKeyDown={(e) => handleKeyPressed(e.key, 's', 2)}
             role="button"
-            tabIndex={-1}
+            tabIndex={0}
           >
             {startTime.at(3)}
           </span>
           <span
-            className={cx(charStyle, isInEdit && 'underline')}
-            id="s:4"
-            onKeyDown={(e) => handleKeyPressed(e, 's', 1)}
+            className={charStyle}
+            ref={digitRefs.get('s')?.[3]}
+            onKeyDown={(e) => handleKeyPressed(e.key, 's', 3)}
             role="button"
-            tabIndex={-1}
+            tabIndex={0}
           >
             {startTime.at(4)}
           </span>
@@ -114,39 +138,39 @@ export const TimerIntervalInput: FC<Props> = ({
       {isEndTimeVisible && (
         <div className="inline-block">
           <span
-            className={cx(charStyle, isInEdit && 'underline')}
-            id="e:1"
-            onKeyDown={(e) => handleKeyPressed(e, 'e', 600)}
+            className={charStyle}
+            ref={digitRefs.get('e')?.[0]}
+            onKeyDown={(e) => handleKeyPressed(e.key, 'e', 0)}
             role="button"
-            tabIndex={-1}
+            tabIndex={0}
           >
             {endTime.at(0)}
           </span>
           <span
-            className={cx(charStyle, isInEdit && 'underline')}
-            id="e:2"
-            onKeyDown={(e) => handleKeyPressed(e, 'e', 60)}
+            className={charStyle}
+            ref={digitRefs.get('e')?.[1]}
+            onKeyDown={(e) => handleKeyPressed(e.key, 'e', 1)}
             role="button"
-            tabIndex={-1}
+            tabIndex={0}
           >
             {endTime.at(1)}
           </span>
           :
           <span
-            className={cx(charStyle, isInEdit && 'underline')}
-            id="e:3"
-            onKeyDown={(e) => handleKeyPressed(e, 'e', 10)}
+            className={charStyle}
+            ref={digitRefs.get('e')?.[2]}
+            onKeyDown={(e) => handleKeyPressed(e.key, 'e', 2)}
             role="button"
-            tabIndex={-1}
+            tabIndex={0}
           >
             {endTime.at(3)}
           </span>
           <span
-            className={cx(charStyle, isInEdit && 'underline')}
-            id="e:4"
-            onKeyDown={(e) => handleKeyPressed(e, 'e', 1)}
+            className={charStyle}
+            ref={digitRefs.get('e')?.[3]}
+            onKeyDown={(e) => handleKeyPressed(e.key, 'e', 3)}
             role="button"
-            tabIndex={-1}
+            tabIndex={0}
           >
             {endTime.at(4)}
           </span>

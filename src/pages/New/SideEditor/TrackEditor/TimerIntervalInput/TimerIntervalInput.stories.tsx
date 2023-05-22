@@ -5,7 +5,7 @@ import React from 'react';
 import { TimerIntervalInput } from './TimerIntervalInput';
 
 export default {
-  title: 'UI/TimerIntervalInput',
+  title: 'SideEditor/TrackEditor/TimerIntervalInput',
   component: TimerIntervalInput,
 } as ComponentMeta<typeof TimerIntervalInput>;
 
