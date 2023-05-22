@@ -39,7 +39,7 @@ export const InsertEditor: FC = () => {
       <div className="grid gap-2 lg:grid-cols-3">
         <ImageEditor previewCanvasRef={frontPreviewCanvasRef} aspect={65 / 101.5} title="Front Panel" />
         <ImageEditor previewCanvasRef={spinePreviewCanvasRef} aspect={12.5 / 101.5} title="Spine" />
-        <ImageEditor previewCanvasRef={backPreviewCanvasRef} aspect={26.5 / 101.5} title="Rare Tab" />
+        <ImageEditor previewCanvasRef={backPreviewCanvasRef} aspect={26.5 / 101.5} title="Rear Tab" />
       </div>
 
       <div className="flex justify-center">
