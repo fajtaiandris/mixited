@@ -20,10 +20,10 @@ export const New: FC = () => {
 
   const handleSideUpdate = (trackList: Track[], side: Side) => {
     if (side === 'A') {
-      setTape({ ...tape, sideA: trackList });
+      setTape({ ...tape, sideA: [...trackList] });
     }
     if (side === 'B') {
-      setTape({ ...tape, sideB: trackList });
+      setTape({ ...tape, sideB: [...trackList] });
     }
     setSideInEdit(null);
   };
