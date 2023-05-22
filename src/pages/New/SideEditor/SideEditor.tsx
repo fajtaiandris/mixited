@@ -56,7 +56,7 @@ export const SideEditor: FC<SideEditorProps> = ({ side, isInEdit, onStartEdit, o
         <h2 className="text-xl">Side {side}</h2>
         {trackList.map((track, i) => (
           <TrackEditor
-            key={side + i}
+            key={side + i + JSON.stringify(track)}
             track={track}
             index={i}
             isInEdit={isInEdit && trackInEdit === i}

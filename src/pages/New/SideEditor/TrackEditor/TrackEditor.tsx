@@ -80,7 +80,7 @@ export const TrackEditor: FC<TrackEditorProps> = ({
   };
 
   useEffect(() => {
-    reset({ startSec: track.startSec, endSec: track.endSec });
+    reset({ ...track });
   }, [isInEdit]);
 
   const handleStartEdit = () => {
